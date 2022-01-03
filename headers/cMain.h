@@ -1,6 +1,10 @@
 #pragma once
-#include "wx/wx.h"
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 #include "wx/filepicker.h"
+#include "include/Recorder.h"
 
 using namespace std;
 
@@ -8,7 +12,6 @@ enum {
     REC_BTN_ID,
     PAUSE_BTN_ID,
     MIC_BTN_ID,
-    CROP_BTN_ID,
     LOGGER_ID,
     PICKER_ID,
     FILE_LABEL_ID,
@@ -22,7 +25,7 @@ enum {
 };
 
 const int BTN_BORDER = 50;
-const int WIDTH = 600, HEIGHT = 400;
+const int WIDTH = 600, HEIGHT = 500;
 const int POS_X = 100, POS_Y = 100;
 
 class cMain : public wxFrame
@@ -37,13 +40,12 @@ private:
     wxArrayString wx_video_sources;
     wxArrayString wx_audio_sources;
 
-    //Recorder* r = nullptr;
+    Recorder* r = nullptr;
 public:
     //BUTTONS
     wxButton* rec_btn = nullptr;
     wxButton* pause_btn = nullptr;
     wxButton* mic_btn = nullptr;
-    wxButton* crop_btn = nullptr;
 
     //CROP TEXT CTRL
     wxTextCtrl* up_margin = nullptr;
@@ -65,7 +67,6 @@ public:
     void OnRecClicked(wxCommandEvent& evt);
     void OnPauseClicked(wxCommandEvent& evt);
     void OnMicClicked(wxCommandEvent& evt);
-    void OnCropClicked(wxCommandEvent& evt);
     void OnVideoInputChanged(wxCommandEvent& evt);
     void OnAudioInputChanged(wxCommandEvent& evt);
     void OnFileChanged(wxFileDirPickerEvent& evt);

@@ -5,7 +5,6 @@ wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 	EVT_BUTTON(REC_BTN_ID, cMain::OnRecClicked)
 	EVT_BUTTON(PAUSE_BTN_ID, cMain::OnPauseClicked)
 	EVT_BUTTON(MIC_BTN_ID, cMain::OnMicClicked)
-	EVT_BUTTON(CROP_BTN_ID, cMain::OnCropClicked)
 	EVT_CHOICE(VIDEO_COMBOBOX_ID, cMain::OnVideoInputChanged)
 	EVT_CHOICE(AUDIO_COMBOBOX_ID, cMain::OnAudioInputChanged)
 	EVT_FILEPICKER_CHANGED(PICKER_ID, cMain::OnFileChanged)
@@ -15,12 +14,10 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 {
 	this->SetBackgroundColour(wxColour(255,255,255));
 
-	//r = new Recorder();
+	r = new Recorder();
 
 	path = "./out";
 
-	//CaptureMouse();
-	//SetTransparent();
 	recording = false;
 	mic_enabled = false;
 	paused = false;
@@ -40,7 +37,6 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 	fileSizer->Add(file_picker, 1, wxRIGHT | wxLEFT, 10);
 
 
-	crop_btn = new wxButton(this, CROP_BTN_ID, "Crop Margin");
 	up_margin = new wxTextCtrl(this, UP_CROP_ID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
 	up_margin->SetHint("Up");
 	down_margin = new wxTextCtrl(this, DOWN_CROP_ID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
@@ -55,25 +51,22 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 	fps->SetHint("FPS");
 
 	
-	//vector<string> video_sources = Recorder::recorder_get_video_devices_list();
+	vector<string> video_sources = Recorder::recorder_get_video_devices_list();
 	wx_video_sources = wxArrayString();
-/*
 	for (string s : video_sources)
 	{
 		wx_video_sources.Add(s);
 	}
- */
 	video_source = new wxChoice(this, VIDEO_COMBOBOX_ID, wxDefaultPosition, wxDefaultSize, wx_video_sources);
 	video_source->SetSelection(0);
 
-	//vector<string> audio_sources = Recorder::recorder_get_audio_devices_list();
+	vector<string> audio_sources = Recorder::recorder_get_audio_devices_list();
 	wx_audio_sources = wxArrayString();
-/*
 	for (string s : audio_sources)
 	{
+        cout<<s<<endl;
 		wx_audio_sources.Add(s);
 	}
- */
 	audio_source = new wxChoice(this, AUDIO_COMBOBOX_ID, wxDefaultPosition, wxDefaultSize, wx_audio_sources);
 	audio_source->SetSelection(0);
 
@@ -83,7 +76,6 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 	inputSizer->Add(fps, 2, wxRIGHT | wxLEFT, 10);
 	
 	wxBoxSizer* cropSizer = new wxBoxSizer(wxHORIZONTAL);
-	cropSizer->Add(crop_btn, 1, 0, 0);
 	cropSizer->Add(up_margin, 1, 0, 0);
 	cropSizer->Add(down_margin, 1, 0, 0);
 	cropSizer->Add(left_margin, 1, 0, 0);
@@ -112,9 +104,9 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 {
 	if (recording)
 	{
-		//r->recorder_stop_recording();
+		r->recorder_stop_recording();
 
-		//r = new Recorder();
+		r = new Recorder();
 
 		rec_btn->SetLabel("Start Recording");
 		recording = false;
@@ -127,15 +119,19 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 
 		if (mic_enabled) {
 			int audio_choice = audio_source->GetSelection();
-			//r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(fps->GetValue().ToStdString()), wx_audio_sources[audio_choice].ToStdString());
+			r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(fps->GetValue().ToStdString()), wx_audio_sources[audio_choice].ToStdString());
 		}
 		else {
-			//r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(fps->GetValue().ToStdString()), "");
+			r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(fps->GetValue().ToStdString()), "");
 		}
+        cout<<"selected video: " + video_choice<<endl;
 		crop();
-		//r->recorder_init_output(path);
-		//r->recorder_start_recording();
-		
+        cout<<"cropped"<<endl;
+		r->recorder_init_output(path);
+        cout<<"out init"<<endl;
+		r->recorder_start_recording();
+        cout<<"started"<<endl;
+
 		rec_btn->SetLabel("Stop Recording");
 		recording = true;
 
@@ -144,7 +140,6 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 
 	pause_btn->Enable(recording);
 	mic_btn->Enable(!recording);
-	crop_btn->Enable(!recording);
 	evt.Skip();
 }
 
@@ -152,7 +147,7 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 {
 	if (paused)
 	{
-		//r->recorder_resume_recording();
+		r->recorder_resume_recording();
 
 		pause_btn->SetLabel("Pause Recording");
 		paused = false;
@@ -161,7 +156,7 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 	}
 	else
 	{
-		//r->recorder_pause_recording();
+		r->recorder_pause_recording();
 
 		pause_btn->SetLabel("Resume Recording");
 		paused = true;
@@ -187,24 +182,6 @@ void cMain::OnMicClicked(wxCommandEvent& evt)
 	evt.Skip();
 }
 
-void cMain::OnCropClicked(wxCommandEvent& evt)
-{
-	string up_margin_str = up_margin->GetValue().ToStdString();
-	string down_margin_str = down_margin->GetValue().ToStdString();
-	string left_margin_str = left_margin->GetValue().ToStdString();
-	string right_margin_str = right_margin->GetValue().ToStdString();
-
-	int up_margin_value = stoi(up_margin_str);
-	int down_margin_value = stoi(up_margin_str);
-	int left_margin_value = stoi(up_margin_str);
-	int right_margin_value = stoi(up_margin_str);
-
-	//r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
-
-	logger->SetLabel("Cropped " + up_margin_str + ":" + down_margin_str + ":" + left_margin_str + ":" + right_margin_str);
-	evt.Skip();
-}
-
 void cMain::crop()
 {
 	string up_margin_str = up_margin->GetValue().ToStdString();
@@ -217,7 +194,7 @@ void cMain::crop()
 	int left_margin_value = stoi(up_margin_str);
 	int right_margin_value = stoi(up_margin_str);
 
-	//r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
+	r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
 }
 
 void cMain::OnVideoInputChanged(wxCommandEvent& evt)

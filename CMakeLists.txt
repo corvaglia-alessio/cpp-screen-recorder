@@ -5,10 +5,40 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include(${wxWidgets_USE_FILE})
+add_executable(screen_recorder_cpp_gui cApp.cpp cMain.cpp include/Recorder.cpp)
 
-#include_directories(D:/Projects/C++/screen-recorder-cpp-gui/libs/wx-3.1.5-x64/include/msvc;D:/Projects/C++/screen-recorder-cpp-gui/libs/wx-3.1.5-x64/include)
-add_executable(screen_recorder_cpp_gui cApp.cpp cMain.cpp)
+if(WIN32)
+    include_directories(C:/FFmpeg/include)
 
-target_link_libraries(screen_recorder_cpp_gui ${wxWidgets_LIBRARIES})
-#target_link_libraries(screen_recorder_cpp_gui wx::net wx::core wx::base)
-#target_link_libraries(screen_recorder_cpp_gui D:/Projects/C++/screen-recorder-cpp-gui/libs/wx-3.1.5-x64/lib/vc14x_x64_dll)
+    target_link_libraries(${PROJECT_NAME}
+            "C:/FFmpeg/lib/avcodec.lib"
+            "C:/FFmpeg/lib/avdevice.lib"
+            "C:/FFmpeg/lib/avfilter.lib"
+            "C:/FFmpeg/lib/avformat.lib"
+            "C:/FFmpeg/lib/avutil.lib"
+            "C:/FFmpeg/lib/postproc.lib"
+            "C:/FFmpeg/lib/swresample.lib"
+            "C:/FFmpeg/lib/swscale.lib"
+            ${wxWidgets_LIBRARIES}
+            )
+endif(WIN32)
+
+IF(UNIX OR APPLE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBS REQUIRED IMPORTED_TARGET
+            libavcodec
+            libavdevice
+            libavfilter
+            libavformat
+            libavutil
+            libswscale
+            libswresample
+            )
+
+    include_directories(.)
+
+    target_link_libraries(${PROJECT_NAME}
+            PkgConfig::LIBS
+            ${wxWidgets_LIBRARIES}
+            )
+endif(UNIX OR APPLE)
