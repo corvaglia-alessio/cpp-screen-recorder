@@ -78,6 +78,11 @@ public:
     wxChoice* video_source = nullptr;
     wxChoice* audio_source = nullptr;
 
+    // DYNAMIC LABELS
+    wxStaticText* rec_label = nullptr;
+    wxStaticText* pause_label = nullptr;
+    wxStaticText* mic_label = nullptr;
+
     wxStaticText* logger = nullptr;
 
     wxStaticText* file_label = nullptr;

@@ -10,7 +10,7 @@
 #include <vector>
 #include <fstream>
 
-#define UNIX
+#define WINDOWS
 
 using namespace std;
 
