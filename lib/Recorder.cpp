@@ -188,7 +188,7 @@ void Recorder::open_audio_output() {
 void Recorder::recorder_open_inputs(const string& video_input, int frames_per_second, string audio_input) {
 
     if(frames_per_second <= 0 || frames_per_second > 30)
-        throw logic_error("[LOGIC ERROR] frames_per_second must be in the range [1, 30]");
+        throw invalid_argument("[INVALID ARGUMENT] frames_per_second must be in the range [1, 30]");
     fps = frames_per_second;
 
     if(!audio_input.empty()){
@@ -288,11 +288,11 @@ void Recorder::recorder_open_inputs(const string& video_input, int frames_per_se
 
 void Recorder::recorder_crop_video(int left, int right, int top, int bottom) {
     if(left<0 || right<0 || top<0 || bottom<0)
-        throw logic_error("[LOGIC_ERROR] invalid argument: crop values must be positive");
+        throw invalid_argument("Crop values must be valid");
     if(left+right >= video_in_codec_ctx->width)
-        throw logic_error("[LOGIC_ERROR] invalid argument: cannot crop a number of pixel that is equal or greater than the input width");
+        throw invalid_argument("Crop values must be valid");
     if(bottom+top >= video_in_codec_ctx->height)
-        throw logic_error("[LOGIC_ERROR] invalid argument: cannot crop a number of pixel that is equal or greater than the input height");
+        throw invalid_argument("Crop values must be valid");
 
     this->c_left = left;
     this->c_right = right;
@@ -336,7 +336,7 @@ void Recorder::recorder_init_output(const string& path_name){
     if(!path_name.empty())
         s = path_name + ".mp4";
     else
-        throw logic_error("[LOGIC_ERROR] the path_name is empty");
+        throw invalid_argument("[INVALID ARGUMENT] the path_name is empty");
 
     ret = avformat_alloc_output_context2(&out_fmt_ctx, nullptr, nullptr, s.c_str());
     if(ret<0 || !out_fmt_ctx)
@@ -602,7 +602,7 @@ void Recorder::recorder_stop_recording(){
         ul.unlock();
         status_cv.notify_one();
         recording_thread.join();
-        cout<<"STOP"<<endl;
+        destroy_audio_input();
     }
     else
         throw logic_error("[LOGIC_ERROR] already in STOP state");
@@ -618,7 +618,6 @@ void Recorder::recorder_start_recording() {
         }
         status = RECORDING;
         recording_thread = thread([this] { this->record_loop();});
-        cout<<"RECORDING"<<endl;
     }
     else
         throw logic_error("[LOGIC_ERROR] not possible to start recording. Either because you are already recording or because you are in PAUSE state, in the latter case use recorder_resume_recording() instead");
@@ -628,7 +627,6 @@ void Recorder::recorder_pause_recording() {
     lock_guard<mutex> lg(status_mutex);
     if(status == RECORDING) {
         status = PAUSE;
-        cout<<"PAUSE"<<endl;
     }
     else
         throw logic_error("[LOGIC_ERROR] cannot pause, not in RECORDING state.");
@@ -644,7 +642,6 @@ void Recorder::recorder_resume_recording() {
             open_audio_input();
         }
         status_cv.notify_one();
-        cout<<"RECORDING"<<endl;
     }
     else
         throw logic_error("[LOGIC_ERROR] cannot resume, not in PAUSE state.");

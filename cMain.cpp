@@ -1,6 +1,5 @@
 #include "headers/cMain.h"
 
-
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 	EVT_BUTTON(REC_BTN_ID, cMain::OnRecClicked)
 	EVT_BUTTON(PAUSE_BTN_ID, cMain::OnPauseClicked)
@@ -14,12 +13,27 @@ wxEND_EVENT_TABLE()
 
 
 std::wstring ExePath() {
-	TCHAR buffer[MAX_PATH] = { 0 };
-	GetModuleFileName(NULL, buffer, MAX_PATH);
-	std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
-	std::wstring exe_path = std::wstring(buffer).substr(0, pos);
-	std::replace(exe_path.begin(), exe_path.end(), '\\', '/');
-	return exe_path;
+#ifdef UNIX
+    char pBuf[MAX_BYTES];
+    size_t len = size(pBuf);
+    int bytes = MIN(readlink("/proc/self/exe", pBuf, len), len-1);
+    if(bytes >= 0)
+        pBuf[bytes] = '\0';
+    int last_slash = 0;
+    for(int i=0; i<bytes; i++) {
+        if (pBuf[i] == '/')
+            last_slash = i;
+    }
+    return std::wstring (&pBuf[0], &pBuf[last_slash]);
+#else
+    TCHAR buffer[MAX_PATH] = { 0 };
+    GetModuleFileName(NULL, buffer, MAX_PATH);
+    std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
+    std::wstring exe_path = std::wstring(buffer).substr(0, pos);
+    std::replace(exe_path.begin(), exe_path.end(), '\\', '/');
+    return exe_path;
+#endif
+
 }
 
 
@@ -159,13 +173,15 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 			r->recorder_stop_recording();
 		}
 		catch (const std::exception& e) {
-			logger->SetLabel(e.what());
-		}
+            logger->SetLabel(e.what());
+            r = new Recorder();
+        }
 
 		r = new Recorder();
 
 		rec_btn->SetBitmap(*rec_btm);
-		recording = false;
+        pause_btn->SetBitmap(*pause_btm);
+        recording = false;
 
 		logger->SetLabel("Ready");
 	}
@@ -193,8 +209,9 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 			logger->SetLabel("Recording in progress");
 		}
 		catch (const std::exception& e) {
-			logger->SetLabel(e.what());
-		}
+            logger->SetLabel(e.what());
+            r = new Recorder();
+        }
 	}
 
 	pause_btn->Enable(recording);
@@ -210,8 +227,9 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 			r->recorder_resume_recording();
 		}
 		catch (const std::exception& e) {
-			logger->SetLabel(e.what());
-		}
+            logger->SetLabel(e.what());
+            r = new Recorder();
+        }
 
 		pause_btn->SetBitmap(*pause_btm);
 		paused = false;
@@ -224,8 +242,9 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 			r->recorder_pause_recording();
 		}
 		catch (const std::exception& e) {
-			logger->SetLabel(e.what());
-		}
+            logger->SetLabel(e.what());
+            r = new Recorder();
+        }
 
 		pause_btn->SetBitmap(*play_btm);
 		paused = true;
@@ -258,19 +277,37 @@ void cMain::crop()
 	string left_margin_str = left_margin->GetValue().ToStdString();
 	string right_margin_str = right_margin->GetValue().ToStdString();
 
-	if (!up_margin_str.empty() && !down_margin_str.empty() && !left_margin_str.empty() && !right_margin_str.empty())
-	{
-		try {
-			int up_margin_value = stoi(up_margin_str);
-			int down_margin_value = stoi(down_margin_str);
-			int left_margin_value = stoi(left_margin_str);
-			int right_margin_value = stoi(right_margin_str);
 
-			r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
-		}
-		catch (const std::invalid_argument& ia) {
-			logger->SetLabel("Please use valid argument in crop fields");
-		}
+	if (!up_margin_str.empty() || !down_margin_str.empty() || !left_margin_str.empty() || !right_margin_str.empty())
+	{
+        int up_margin_value, down_margin_value, left_margin_value, right_margin_value;
+        try {
+
+            if (up_margin_str.empty())
+                up_margin_value = 0;
+            else
+                up_margin_value = stoi(up_margin_str);
+
+            if (down_margin_str.empty())
+                down_margin_value = 0;
+            else
+                down_margin_value = stoi(down_margin_str);
+
+            if (left_margin_str.empty())
+                left_margin_value = 0;
+            else
+                left_margin_value = stoi(left_margin_str);
+
+            if (right_margin_str.empty())
+                right_margin_value = 0;
+            else
+                right_margin_value = stoi(right_margin_str);
+        }
+        catch (const invalid_argument &ia){
+            logger->SetLabel("Type valid input into crop fields");
+        }
+
+        r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
 	}
 }
 

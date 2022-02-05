@@ -6,6 +6,9 @@
 #include "wx/filepicker.h"
 #include "../include/Recorder.h"
 
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define MAX_BYTES 8192
+
 using namespace std;
 
 enum {
