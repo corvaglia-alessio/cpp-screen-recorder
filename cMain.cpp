@@ -53,7 +53,7 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 
 	//	INIT COMPONENTS
 		wxFont font_for_desc = GetFont().Italic();
-		wxFont font_for_header = GetFont().Larger().Bold();
+		wxFont font_for_header = GetFont().Bold();
 
 		//	LOAD BITMAPS
 		settings_btm = new wxBitmap(ExePath() + "/sources/settings.png", wxBITMAP_TYPE_PNG);
@@ -145,7 +145,7 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 		rec_label->SetFont(font_for_desc);
 		pause_label = new wxStaticText(this, wxID_ANY, "Pause", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 		pause_label->SetFont(font_for_desc);
-		mic_label = new wxStaticText(this, wxID_ANY, "Enable Mic", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+		mic_label = new wxStaticText(this, wxID_ANY, "Mic off", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 		mic_label->SetFont(font_for_desc);
 
 
@@ -230,6 +230,7 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 	rec_settings_box->Show(false);
 
 	SetSizerAndFit(main_sizer);
+    Layout();
 }
 
 void cMain::OnRecClicked(wxCommandEvent& evt)
@@ -332,13 +333,13 @@ void cMain::OnMicClicked(wxCommandEvent& evt)
 	if (mic_enabled) 
 	{
 		mic_btn->SetBitmap(*mic_off_btm);
-		mic_label->SetLabel("Enable Mic");
+		mic_label->SetLabel("Mic off");
 		mic_enabled = false;
 	}
 	else
 	{
 		mic_btn->SetBitmap(*mic_on_btm);
-		mic_label->SetLabel("Dis Mic");
+		mic_label->SetLabel("Mic on");
 		mic_enabled = true;
 	}
 	
