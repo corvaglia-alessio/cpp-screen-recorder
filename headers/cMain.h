@@ -99,6 +99,7 @@ public:
     void OnFileChanged(wxFileDirPickerEvent& evt);
     void OnFPSChanged(wxCommandEvent& evt);
     void crop();
+    void reset_gui();
 
     wxDECLARE_EVENT_TABLE();
 };

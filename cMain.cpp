@@ -241,8 +241,10 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 			r->recorder_stop_recording();
 		}
 		catch (const std::exception& e) {
-            logger->SetLabel(e.what());
+            //logger->SetLabel(e.what());
+			wxMessageBox(e.what(), "", wxICON_ERROR);
             r = new Recorder();
+			reset_gui();
         }
 		
 		r = new Recorder();
@@ -252,12 +254,13 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 
         pause_btn->SetBitmap(*pause_btm);
 		pause_label->SetLabel("Pause");
-        recording = false;
-
+        
 		logger->SetLabel("Ready");
+		recording = false;
 	}
 	else
 	{
+		logger->SetLabel("Recording is starting");
 		try {
 			int video_choice = video_source->GetSelection();
 			int fps_choice = fps->GetSelection();
@@ -276,13 +279,15 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 
 			rec_btn->SetBitmap(*stop_btm);
 			rec_label->SetLabel("Stop");
-			recording = true;
 
 			logger->SetLabel("Recording in progress");
+			recording = true;
 		}
 		catch (const std::exception& e) {
-            logger->SetLabel(e.what());
+            //logger->SetLabel(e.what());
+			wxMessageBox(e.what(), "", wxICON_ERROR);
             r = new Recorder();
+			reset_gui();
         }
 	}
 
@@ -299,8 +304,10 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 			r->recorder_resume_recording();
 		}
 		catch (const std::exception& e) {
-            logger->SetLabel(e.what());
+            //logger->SetLabel(e.what());
+			wxMessageBox(e.what(), "", wxICON_ERROR);
             r = new Recorder();
+			reset_gui();
         }
 
 		pause_btn->SetBitmap(*pause_btm);
@@ -315,8 +322,10 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 			r->recorder_pause_recording();
 		}
 		catch (const std::exception& e) {
-            logger->SetLabel(e.what());
+            //logger->SetLabel(e.what());
+			wxMessageBox(e.what(), "", wxICON_ERROR);
             r = new Recorder();
+			reset_gui();
         }
 
 		pause_btn->SetBitmap(*play_btm);
@@ -380,7 +389,8 @@ void cMain::crop()
                 right_margin_value = stoi(right_margin_str);
         }
         catch (const invalid_argument &ia){
-            logger->SetLabel("Type valid input into crop fields");
+            //logger->SetLabel("Type valid input into crop fields");
+			wxMessageBox("The crop margins should be numeric values", "", wxICON_ERROR);
         }
 
         r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
@@ -430,4 +440,17 @@ void cMain::ToggleSettings(wxCommandEvent& evt)
 	main_sizer->Layout();
 	Fit();
 	evt.Skip();
+}
+
+void cMain::reset_gui()
+{
+	logger->SetLabel("Ready");
+
+	recording = false;
+	rec_btn->SetBitmap(*rec_btm);
+	rec_label->SetLabel("Record");
+
+	paused = false;
+	pause_btn->SetBitmap(*pause_btm);
+	pause_label->SetLabel("Pause");
 }
