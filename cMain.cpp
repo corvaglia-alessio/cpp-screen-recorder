@@ -453,4 +453,7 @@ void cMain::reset_gui()
 	paused = false;
 	pause_btn->SetBitmap(*pause_btm);
 	pause_label->SetLabel("Pause");
+
+	pause_btn->Enable(recording);
+	mic_btn->Enable(!recording);
 }
