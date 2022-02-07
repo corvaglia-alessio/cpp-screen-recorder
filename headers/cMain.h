@@ -57,12 +57,7 @@ public:
     wxBitmap* mic_on_btm = nullptr;
     wxBitmap* mic_off_btm = nullptr;
     wxBitmap* crop_btm = nullptr;
-
-    //CROP TEXT CTRL
-    wxTextCtrl* up_margin = nullptr;
-    wxTextCtrl* down_margin = nullptr;
-    wxTextCtrl* left_margin = nullptr;
-    wxTextCtrl* right_margin = nullptr;
+    wxBitmap* cancel_btm = nullptr;
 
     wxChoice* fps = nullptr;
     wxChoice* video_source = nullptr;
@@ -72,6 +67,7 @@ public:
     wxStaticText* rec_label = nullptr;
     wxStaticText* pause_label = nullptr;
     wxStaticText* mic_label = nullptr;
+    wxStaticText* crop_label = nullptr;
 
     wxStaticText* logger = nullptr;
 
@@ -90,7 +86,7 @@ public:
     void OnFPSChanged(wxCommandEvent& evt);
     void OnCropClicked(wxCommandEvent& evt);
     void SaveCropValues(int w, int h, int x, int y);
-    void crop();
+    void crop(vector<int> screen_dim);
     void reset_gui();
 
     wxDECLARE_EVENT_TABLE();

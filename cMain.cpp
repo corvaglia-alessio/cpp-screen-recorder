@@ -40,6 +40,7 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 		mic_on_btm = new wxBitmap(ExePath() + "/sources/mic_on.png", wxBITMAP_TYPE_PNG);
 		mic_off_btm = new wxBitmap(ExePath() + "/sources/mic_off.png", wxBITMAP_TYPE_PNG);
 		crop_btm = new wxBitmap(ExePath() + "/sources/crop.png", wxBITMAP_TYPE_PNG);
+		cancel_btm = new wxBitmap(ExePath() + "/sources/close.png", wxBITMAP_TYPE_PNG);
 
 		//	BUTTONS
 		settings_btn = new wxBitmapButton(this, SETTINGS_BTN_ID, *settings_btm, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -66,16 +67,6 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 		//	FILE PICKER
 		file_picker = new wxFilePickerCtrl(this, PICKER_ID, wxEmptyString, wxString::FromAscii(wxFileSelectorPromptStr), wxString::FromAscii(wxFileSelectorDefaultWildcardStr), wxDefaultPosition, wxDefaultSize, wxFLP_SAVE);
 		file_label = new wxStaticText(this, FILE_LABEL_ID, path + ".mp4", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
-
-		//	CROP MARGIN
-		up_margin = new wxTextCtrl(this, UP_CROP_ID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-		up_margin->SetHint("Up");
-		down_margin = new wxTextCtrl(this, DOWN_CROP_ID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-		down_margin->SetHint("Down");
-		left_margin = new wxTextCtrl(this, LEFT_CROP_ID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-		left_margin->SetHint("Left");
-		right_margin = new wxTextCtrl(this, RIGHT_CROP_ID, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-		right_margin->SetHint("Right");
 
 		//	FPS COMBOBOX
 		std::vector<string> rec_fps = { "15", "24", "30" };
@@ -118,8 +109,6 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 		audio_source_label->SetFont(font_for_header);
 		wxStaticText* fps_label = new wxStaticText(this, wxID_ANY, "FPS", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 		fps_label->SetFont(font_for_header);
-		wxStaticText* crop_label = new wxStaticText(this, wxID_ANY, "Crop Pixels x Direction", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
-		crop_label->SetFont(font_for_header);
 
 		rec_label = new wxStaticText(this, wxID_ANY, "Record", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 		rec_label->SetFont(font_for_desc);
@@ -127,6 +116,8 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 		pause_label->SetFont(font_for_desc);
 		mic_label = new wxStaticText(this, wxID_ANY, "Mic off", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 		mic_label->SetFont(font_for_desc);
+		crop_label = new wxStaticText(this, wxID_ANY, "Crop Screen", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+		crop_label->SetFont(font_for_desc);
 
 
 
@@ -162,18 +153,6 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 
 	wxBoxSizer* rec_settings_label_sizer = new wxBoxSizer(wxVERTICAL);
 	rec_settings_label_sizer->Add(rec_settings_sizer, 0, wxEXPAND | wxBOTTOM, 25);
-	
-
-	wxBoxSizer* crop_label_sizer = new wxBoxSizer(wxVERTICAL);
-
-		wxBoxSizer* crop_sizer = new wxBoxSizer(wxHORIZONTAL);
-		crop_sizer->Add(up_margin, 1, 0, 0);
-		crop_sizer->Add(down_margin, 1, 0, 0);
-		crop_sizer->Add(left_margin, 1, 0, 0);
-		crop_sizer->Add(right_margin, 1, 0, 0);
-
-	crop_label_sizer->Add(crop_label, 0, wxEXPAND | wxBOTTOM, 10);
-	crop_label_sizer->Add(crop_sizer, 0, wxEXPAND | wxBOTTOM, 25);
 
 	wxBoxSizer* rec_controls_sizer = new wxBoxSizer(wxHORIZONTAL);
 		wxBoxSizer* rec_label_sizer = new wxBoxSizer(wxVERTICAL);
@@ -188,9 +167,14 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 		mic_label_sizer->Add(mic_btn, 0, wxEXPAND | wxBOTTOM, 10);
 		mic_label_sizer->Add(mic_label, 0, wxEXPAND, 0);
 
+		wxBoxSizer* crop_label_sizer = new wxBoxSizer(wxVERTICAL);
+		crop_label_sizer->Add(crop_btn, 0, wxEXPAND | wxBOTTOM, 10);
+		crop_label_sizer->Add(crop_label, 0, wxEXPAND, 0);
+
 	rec_controls_sizer->Add(rec_label_sizer, 1, wxRIGHT | wxLEFT, 20);
 	rec_controls_sizer->Add(pause_label_sizer, 1, wxRIGHT | wxLEFT, 20);
 	rec_controls_sizer->Add(mic_label_sizer, 1, wxRIGHT | wxLEFT, 20);
+	rec_controls_sizer->Add(crop_label_sizer, 1, wxRIGHT | wxLEFT, 20);
 
 	rec_controls_box = new wxBoxSizer(wxVERTICAL);
 	rec_controls_box->Add(rec_controls_sizer, 0, wxEXPAND | wxRIGHT | wxLEFT, 20);
@@ -199,7 +183,7 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 	rec_settings_box = new wxBoxSizer(wxVERTICAL);
 	rec_settings_box->Add(file_picker_label_sizer, 0, wxEXPAND | wxRIGHT | wxLEFT, 20);
 	rec_settings_box->Add(rec_settings_label_sizer, 0, wxEXPAND | wxTOP | wxRIGHT | wxLEFT, 20);
-	rec_settings_box->Add(crop_label_sizer, 0, wxEXPAND | wxTOP | wxRIGHT | wxLEFT, 20);
+	//rec_settings_box->Add(crop_label_sizer, 0, wxEXPAND | wxTOP | wxRIGHT | wxLEFT, 20);
 
 	main_sizer = new wxBoxSizer(wxVERTICAL);
 	main_sizer->Add(settings_btn, 0, wxALIGN_RIGHT | wxTOP | wxRIGHT, 10);
@@ -245,15 +229,23 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 			int video_choice = video_source->GetSelection();
 			int fps_choice = fps->GetSelection();
 
-			if (mic_enabled) {
+			vector<int> screen_dim;
+
+			if (mic_enabled) 
+			{
 				int audio_choice = audio_source->GetSelection();
-				r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(wx_rec_fps[fps_choice].ToStdString()), wx_audio_sources[audio_choice].ToStdString());
+				screen_dim = r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(wx_rec_fps[fps_choice].ToStdString()), wx_audio_sources[audio_choice].ToStdString());
 			}
-			else {
-				r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(wx_rec_fps[fps_choice].ToStdString()), "");
+			else 
+			{
+				screen_dim = r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(wx_rec_fps[fps_choice].ToStdString()), "");
 			}
 
-			crop();
+			if (perform_crop)
+			{
+				crop(screen_dim);
+			}
+			
 			r->recorder_init_output(path);
 			r->recorder_start_recording();
 
@@ -335,46 +327,51 @@ void cMain::OnMicClicked(wxCommandEvent& evt)
 	evt.Skip();
 }
 
-void cMain::crop()
+void cMain::crop(vector<int> screen_dim)
 {
-	string up_margin_str = up_margin->GetValue().ToStdString();
-	string down_margin_str = down_margin->GetValue().ToStdString();
-	string left_margin_str = left_margin->GetValue().ToStdString();
-	string right_margin_str = right_margin->GetValue().ToStdString();
-
-
-	if (!up_margin_str.empty() || !down_margin_str.empty() || !left_margin_str.empty() || !right_margin_str.empty())
+	int up_margin, bottom_margin, left_margin, right_margin;
+	if (crop_x < 0)
+		left_margin = 0;
+	else
 	{
-        int up_margin_value, down_margin_value, left_margin_value, right_margin_value;
-        try {
-
-            if (up_margin_str.empty())
-                up_margin_value = 0;
-            else
-                up_margin_value = stoi(up_margin_str);
-
-            if (down_margin_str.empty())
-                down_margin_value = 0;
-            else
-                down_margin_value = stoi(down_margin_str);
-
-            if (left_margin_str.empty())
-                left_margin_value = 0;
-            else
-                left_margin_value = stoi(left_margin_str);
-
-            if (right_margin_str.empty())
-                right_margin_value = 0;
-            else
-                right_margin_value = stoi(right_margin_str);
-        }
-        catch (const invalid_argument &ia){
-            //logger->SetLabel("Type valid input into crop fields");
-			wxMessageBox("The crop margins should be numeric values", "", wxICON_ERROR);
-        }
-
-        r->recorder_crop_video(left_margin_value, right_margin_value, up_margin_value, down_margin_value);
+		if (crop_x > screen_dim[0])
+			left_margin = screen_dim[0];
+		else
+			left_margin = crop_x;
 	}
+
+	if (crop_y < 0)
+		up_margin = 0;
+	else
+	{
+		if (crop_y > screen_dim[1])
+			up_margin = screen_dim[1];
+		else
+			up_margin = crop_y;
+	}
+	
+	int end_x = crop_x + crop_w;
+	if (end_x < 0)
+		right_margin = screen_dim[0];
+	else
+	{
+		if (end_x > screen_dim[0])
+			right_margin = 0;
+		else
+			right_margin = screen_dim[0] - end_x;
+	}
+
+	int end_y = crop_y + crop_h;
+	if (end_y < 0)
+		bottom_margin = screen_dim[1];
+	else
+	{
+		if (end_y > screen_dim[1])
+			bottom_margin = 0;
+		else
+			bottom_margin = screen_dim[1] - end_y;
+	}
+	r->recorder_crop_video(left_margin, right_margin, up_margin, bottom_margin);
 }
 
 void cMain::OnVideoInputChanged(wxCommandEvent& evt)
@@ -440,10 +437,19 @@ void cMain::reset_gui()
 
 void cMain::OnCropClicked(wxCommandEvent& evt)
 {
-	CropFrame* crop_frame = new CropFrame(this);
-	crop_frame->Show();
-	this->Enable(false);
-
+	if (perform_crop)
+	{
+		perform_crop = false;
+		crop_btn->SetBitmap(*crop_btm);
+		crop_label->SetLabel("Crop Screen");
+	}
+	else
+	{
+		CropFrame* crop_frame = new CropFrame(this);
+		crop_frame->Show();
+		this->Enable(false);
+	}
+	
 	evt.Skip();
 }
 
@@ -455,4 +461,6 @@ void cMain::SaveCropValues(int w, int h, int x, int y)
 	crop_y = y;
 
 	perform_crop = true;
+	crop_btn->SetBitmap(*cancel_btm);
+	crop_label->SetLabel("Reset");
 }
