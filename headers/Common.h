@@ -1,5 +1,9 @@
 #pragma once
 
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define MAX_BYTES 8192
+#define UNIX
+
 enum {
     REC_BTN_ID,
     PAUSE_BTN_ID,
@@ -23,7 +27,7 @@ enum {
 static std::wstring ExePath() {
 #ifdef UNIX
     char pBuf[MAX_BYTES];
-    size_t len = size(pBuf);
+    size_t len = std::size(pBuf);
     int bytes = MIN(readlink("/proc/self/exe", pBuf, len), len - 1);
     if (bytes >= 0)
         pBuf[bytes] = '\0';
