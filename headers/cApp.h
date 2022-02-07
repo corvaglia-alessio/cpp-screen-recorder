@@ -10,8 +10,9 @@ const std::string APP_NAME = "Screen Recorder";
 
 class cApp : public wxApp
 {
+private:
+    cMain* main_frame = nullptr;
+
 public:
 	virtual bool OnInit();
-private:
-	cMain* main_frame = nullptr;
 };

@@ -8,7 +8,7 @@ bool cApp::OnInit()
         return false;
 
     wxInitAllImageHandlers();
-    main_frame = new cMain(APP_NAME);
+    main_frame = new cMain(nullptr, APP_NAME);
     main_frame->Show();
 
     return true;

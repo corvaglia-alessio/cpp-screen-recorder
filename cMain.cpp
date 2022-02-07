@@ -5,42 +5,17 @@ wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 	EVT_BUTTON(PAUSE_BTN_ID, cMain::OnPauseClicked)
 	EVT_BUTTON(MIC_BTN_ID, cMain::OnMicClicked)
 	EVT_BUTTON(SETTINGS_BTN_ID, cMain::ToggleSettings)
+	EVT_BUTTON(CROP_BTN_ID, cMain::OnCropClicked)
 	EVT_CHOICE(VIDEO_COMBOBOX_ID, cMain::OnVideoInputChanged)
 	EVT_CHOICE(AUDIO_COMBOBOX_ID, cMain::OnAudioInputChanged)
 	EVT_CHOICE(FPS_ID, cMain::OnFPSChanged)
 	EVT_FILEPICKER_CHANGED(PICKER_ID, cMain::OnFileChanged)
 wxEND_EVENT_TABLE()
 
-
-std::wstring ExePath() {
-#ifdef UNIX
-    char pBuf[MAX_BYTES];
-    size_t len = size(pBuf);
-    int bytes = MIN(readlink("/proc/self/exe", pBuf, len), len-1);
-    if(bytes >= 0)
-        pBuf[bytes] = '\0';
-    int last_slash = 0;
-    for(int i=0; i<bytes; i++) {
-        if (pBuf[i] == '/')
-            last_slash = i;
-    }
-    return std::wstring (&pBuf[0], &pBuf[last_slash]);
-#else
-    TCHAR buffer[MAX_PATH] = { 0 };
-    GetModuleFileName(NULL, buffer, MAX_PATH);
-    std::wstring::size_type pos = std::wstring(buffer).find_last_of(L"\\/");
-    std::wstring exe_path = std::wstring(buffer).substr(0, pos);
-    std::replace(exe_path.begin(), exe_path.end(), '\\', '/');
-    return exe_path;
-#endif
-
-}
-
-
-cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS_X, POS_Y), wxSize(WIDTH, HEIGHT), wxMINIMIZE_BOX | wxCAPTION | wxCLOSE_BOX)
+cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, title, wxPoint(300, 300), wxDefaultSize, wxMINIMIZE_BOX | wxCAPTION | wxCLOSE_BOX)
 {
 	this->SetBackgroundColour(wxColour(255,255,255));
-
+	
 	r = new Recorder();
 
 	path = ExePath() + "/out";
@@ -48,6 +23,7 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 	recording = false;
 	mic_enabled = false;
 	paused = false;
+	perform_crop = false;
 
 	in_settings = false;
 
@@ -63,10 +39,14 @@ cMain::cMain(const string title) : wxFrame(nullptr, wxID_ANY, title, wxPoint(POS
 		pause_btm = new wxBitmap(ExePath() + "/sources/pause.png", wxBITMAP_TYPE_PNG);
 		mic_on_btm = new wxBitmap(ExePath() + "/sources/mic_on.png", wxBITMAP_TYPE_PNG);
 		mic_off_btm = new wxBitmap(ExePath() + "/sources/mic_off.png", wxBITMAP_TYPE_PNG);
+		crop_btm = new wxBitmap(ExePath() + "/sources/crop.png", wxBITMAP_TYPE_PNG);
 
 		//	BUTTONS
 		settings_btn = new wxBitmapButton(this, SETTINGS_BTN_ID, *settings_btm, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 		settings_btn->SetBackgroundColour(wxColour(255, 255, 255));
+
+		crop_btn = new wxBitmapButton(this, CROP_BTN_ID, *crop_btm, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+		crop_btn->SetBackgroundColour(wxColour(255, 255, 255));
 
 		rec_btn = new wxBitmapButton(this, REC_BTN_ID, *rec_btm, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 		rec_btn->SetBackgroundColour(wxColour(255, 255, 255));
@@ -456,4 +436,23 @@ void cMain::reset_gui()
 
 	pause_btn->Enable(recording);
 	mic_btn->Enable(!recording);
+}
+
+void cMain::OnCropClicked(wxCommandEvent& evt)
+{
+	CropFrame* crop_frame = new CropFrame(this);
+	crop_frame->Show();
+	this->Enable(false);
+
+	evt.Skip();
+}
+
+void cMain::SaveCropValues(int w, int h, int x, int y)
+{
+	crop_w = w;
+	crop_h = h;
+	crop_x = x;
+	crop_y = y;
+
+	perform_crop = true;
 }

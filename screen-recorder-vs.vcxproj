@@ -21,11 +21,14 @@
   <ItemGroup>
     <ClCompile Include="cApp.cpp" />
     <ClCompile Include="cMain.cpp" />
+    <ClCompile Include="CropFrame.cpp" />
     <ClCompile Include="lib\Recorder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\cApp.h" />
     <ClInclude Include="headers\cMain.h" />
+    <ClInclude Include="headers\Common.h" />
+    <ClInclude Include="headers\CropFrame.h" />
     <ClInclude Include="include\Recorder.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -6,39 +6,25 @@
 #include "wx/filepicker.h"
 #include "../include/Recorder.h"
 
+#include "CropFrame.h"
+#include "Common.h"
+
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define MAX_BYTES 8192
 
 using namespace std;
 
-enum {
-    REC_BTN_ID,
-    PAUSE_BTN_ID,
-    SETTINGS_BTN_ID,
-    MIC_BTN_ID,
-    LOGGER_ID,
-    PICKER_ID,
-    FILE_LABEL_ID,
-    UP_CROP_ID,
-    DOWN_CROP_ID,
-    LEFT_CROP_ID,
-    RIGHT_CROP_ID,
-    VIDEO_COMBOBOX_ID,
-    AUDIO_COMBOBOX_ID,
-    FPS_ID
-};
-
-const int BTN_BORDER = 50;
-const int WIDTH = 600, HEIGHT = 400;
-const int POS_X = 100, POS_Y = 100;
-
 class cMain : public wxFrame
 {
 private:
+
     bool recording;
     bool mic_enabled;
     bool paused;
     bool in_settings;
+
+    bool perform_crop;
+    int crop_w, crop_h, crop_x, crop_y;
 
     string path;
 
@@ -48,6 +34,7 @@ private:
 
     Recorder* r = nullptr;
 public:
+
     //BOXES
     wxBoxSizer* main_sizer = nullptr;
     wxBoxSizer* rec_controls_box = nullptr;
@@ -59,6 +46,8 @@ public:
     wxBitmapButton* mic_btn = nullptr;
     wxBitmapButton* settings_btn = nullptr;
 
+    wxBitmapButton* crop_btn = nullptr;
+
     //BITMAPS
     wxBitmap* settings_btm = nullptr;
     wxBitmap* rec_btm = nullptr;
@@ -67,6 +56,7 @@ public:
     wxBitmap* pause_btm = nullptr;
     wxBitmap* mic_on_btm = nullptr;
     wxBitmap* mic_off_btm = nullptr;
+    wxBitmap* crop_btm = nullptr;
 
     //CROP TEXT CTRL
     wxTextCtrl* up_margin = nullptr;
@@ -88,7 +78,7 @@ public:
     wxStaticText* file_label = nullptr;
     wxFilePickerCtrl* file_picker = nullptr;
 
-    cMain(const string title);
+    cMain(wxFrame* parent, const string title);
 
     void OnRecClicked(wxCommandEvent& evt);
     void OnPauseClicked(wxCommandEvent& evt);
@@ -98,6 +88,8 @@ public:
     void OnAudioInputChanged(wxCommandEvent& evt);
     void OnFileChanged(wxFileDirPickerEvent& evt);
     void OnFPSChanged(wxCommandEvent& evt);
+    void OnCropClicked(wxCommandEvent& evt);
+    void SaveCropValues(int w, int h, int x, int y);
     void crop();
     void reset_gui();
 

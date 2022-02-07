@@ -24,6 +24,9 @@
     <ClCompile Include="lib\Recorder.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="CropFrame.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\cApp.h">
@@ -33,6 +36,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="include\Recorder.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\CropFrame.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Common.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
