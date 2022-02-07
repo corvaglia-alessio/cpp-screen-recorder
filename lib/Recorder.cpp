@@ -185,7 +185,7 @@ void Recorder::open_audio_output() {
         throw runtime_error("[RUNTIME_ERROR] cannot allocate the audio fifo queue");
 }
 
-void Recorder::recorder_open_inputs(const string& video_input, int frames_per_second, string audio_input) {
+vector<int> Recorder::recorder_open_inputs(const string& video_input, int frames_per_second, string audio_input) {
 
     if(frames_per_second <= 0 || frames_per_second > 30)
         throw invalid_argument("[INVALID ARGUMENT] frames_per_second must be in the range [1, 30]");
@@ -284,6 +284,11 @@ void Recorder::recorder_open_inputs(const string& video_input, int frames_per_se
     }
 
     av_dict_free(&opts);
+
+    vector<int> v;
+    v.push_back(video_in_codec_ctx->width);
+    v.push_back(video_in_codec_ctx->height);
+    return v;
 }
 
 void Recorder::recorder_crop_video(int left, int right, int top, int bottom) {

@@ -54,8 +54,9 @@ public:
      * If you do not want to capture the audio, just pass an empty string,
      * otherwise pass the string name of the audio device that you want to capture, use recorder_get_audio_devices_list() to get a list of available devices to choose from.
      * If the input is not compatible, or it does not contain an audio stream (e.g. webcam without a microphone), an exception will be thrown.
+     * @return a vector of int where the first value is the video width and the second value is the video height
      */
-    void recorder_open_inputs(const string& video_input, int frames_per_second, string audio_input);
+    vector<int> recorder_open_inputs(const string& video_input, int frames_per_second, string audio_input);
 
     /**
      * Call this function, only if you want to crop the input video by removing some parts.
