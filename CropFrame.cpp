@@ -12,6 +12,7 @@ wxEND_EVENT_TABLE()
 CropFrame::CropFrame(wxFrame* parent) : wxFrame(parent, wxID_ANY, "", wxPoint(100, 100), wxSize(500, 500), wxCAPTION | wxMAXIMIZE_BOX | wxRESIZE_BORDER)
 {
 	this->SetBackgroundColour(wxColour(255, 255, 255));
+	SetTransparent(160);
 
     //	LOAD BITMAPS
     close_btm = new wxBitmap(ExePath() + "/sources/close.png", wxBITMAP_TYPE_PNG);
