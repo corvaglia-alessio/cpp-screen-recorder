@@ -278,7 +278,6 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 	}
 
 	pause_btn->Enable(recording);
-	mic_btn->Enable(!recording);
 	evt.Skip();
 }
 
@@ -325,23 +324,26 @@ void cMain::OnPauseClicked(wxCommandEvent& evt)
 
 void cMain::OnMicClicked(wxCommandEvent& evt)
 {
-	if (mic_enabled) 
+	if (!recording)
 	{
-		mic_btn->SetBitmap(*mic_off_btm);
-		mic_label->SetLabel("Mic off");
-		mic_enabled = false;
-	}
-	else
-	{
-		if (audio_sources_available)
+		if (mic_enabled)
 		{
-			mic_btn->SetBitmap(*mic_on_btm);
-			mic_label->SetLabel("Mic on");
-			mic_enabled = true;
+			mic_btn->SetBitmap(*mic_off_btm);
+			mic_label->SetLabel("Mic off");
+			mic_enabled = false;
 		}
 		else
 		{
-			wxMessageBox("No audio source available, impossible to enable mic", "Microphone not enabled", wxICON_WARNING);
+			if (audio_sources_available)
+			{
+				mic_btn->SetBitmap(*mic_on_btm);
+				mic_label->SetLabel("Mic on");
+				mic_enabled = true;
+			}
+			else
+			{
+				wxMessageBox("No audio source available, impossible to enable mic", "Microphone not enabled", wxICON_WARNING);
+			}
 		}
 	}
 	evt.Skip();
@@ -457,17 +459,20 @@ void cMain::reset_gui()
 
 void cMain::OnCropClicked(wxCommandEvent& evt)
 {
-	if (perform_crop)
+	if (!recording)
 	{
-		perform_crop = false;
-		crop_btn->SetBitmap(*crop_btm);
-		crop_label->SetLabel("Crop Screen");
-	}
-	else
-	{
-		CropFrame* crop_frame = new CropFrame(this);
-		crop_frame->Show();
-		this->Enable(false);
+		if (perform_crop)
+		{
+			perform_crop = false;
+			crop_btn->SetBitmap(*crop_btm);
+			crop_label->SetLabel("Crop Screen");
+		}
+		else
+		{
+			CropFrame* crop_frame = new CropFrame(this);
+			crop_frame->Show();
+			this->Enable(false);
+		}
 	}
 	
 	evt.Skip();
