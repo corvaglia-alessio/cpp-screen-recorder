@@ -6,7 +6,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ./../bin)
 
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include(${wxWidgets_USE_FILE})
-add_executable(screen_recorder_cpp_gui cApp.cpp cMain.cpp lib/Recorder.cpp)
+add_executable(screen_recorder_cpp_gui cApp.cpp cMain.cpp CropFrame.cpp lib/Recorder.cpp)
 
 IF(UNIX OR APPLE)
     find_package(PkgConfig REQUIRED)

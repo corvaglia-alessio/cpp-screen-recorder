@@ -9,9 +9,6 @@
 #include "CropFrame.h"
 #include "Common.h"
 
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define MAX_BYTES 8192
-
 using namespace std;
 
 class cMain : public wxFrame
