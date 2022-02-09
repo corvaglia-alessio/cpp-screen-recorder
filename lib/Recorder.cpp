@@ -435,26 +435,32 @@ void Recorder::recorder_init_output(const string& path_name){
 void Recorder::record_loop() {
     while(true){
         unique_lock<mutex> ul(status_mutex);
-        while(status == PAUSE) {
-            status_cv.wait(ul);
+        try {
+            while (status == PAUSE) {
+                status_cv.wait(ul);
+            }
+            if (status == STOP) {
+                break;
+            }
+            ul.unlock();
+            if (audio_on) {
+                if (video_turn && (!audio_turn ||
+                                   av_compare_ts(video_next_pts, video_out_codec_ctx->time_base, audio_next_pts,
+                                                 audio_out_codec_ctx->time_base) <= 0))
+                    video_turn = !write_video_frame();
+                else
+                    audio_turn = !write_audio_frame();
+            } else {
+                write_video_frame();
+            }
         }
-        if(status == STOP) {
-            break;
-        }
-        ul.unlock();
-        if(audio_on) {
-            if (video_turn && (!audio_turn || av_compare_ts(video_next_pts, video_out_codec_ctx->time_base, audio_next_pts,audio_out_codec_ctx->time_base) <= 0))
-                video_turn = !write_video_frame();
-            else
-                audio_turn = !write_audio_frame();
-        }
-        else{
-            write_video_frame();
+        catch(exception &e){
+            ul.lock();
+            status = STOP;
+            ul.unlock();
         }
     }
-    ret = av_write_trailer(out_fmt_ctx);
-    if(ret<0)
-        throw runtime_error("[RUNTIME_ERROR] cannot write the output file trailer. The output file may be corrupted!");
+    write_file_trailer();
 }
 
 int Recorder::write_video_frame() {
@@ -811,4 +817,10 @@ vector<string> Recorder::recorder_get_audio_devices_list() {
         }
     #endif
     return v;
+}
+
+void Recorder::write_file_trailer(){
+    ret = av_write_trailer(out_fmt_ctx);
+    if(ret<0)
+        throw runtime_error("[RUNTIME_ERROR] cannot write the output file trailer. The output file may be corrupted!");
 }

@@ -32,6 +32,12 @@ CropFrame::CropFrame(wxFrame* parent) : wxFrame(parent, wxID_ANY, "", wxPoint(10
 	sw_arrow_btn = new wxBitmapButton(this, CROP_FRAME_SW_ARROW_BTN_ID, *sw_arrow_btm, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	sw_arrow_btn->SetBackgroundColour(wxColour(255, 255, 255));
 
+    ne_arrow_btn->Enable(false);
+    nw_arrow_btn->Enable(false);
+    se_arrow_btn->Enable(false);
+    sw_arrow_btn->Enable(false);
+
+
     crop_btn = new wxBitmapButton(this, CROP_FRAME_CROP_BTN_ID, *done_btm, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
     crop_btn->SetBackgroundColour(wxColour(76, 175, 80));
 
