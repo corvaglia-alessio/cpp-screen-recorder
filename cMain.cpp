@@ -90,14 +90,28 @@ cMain::cMain(wxFrame* parent, const string title) : wxFrame(parent, wxID_ANY, ti
 
 		//	AUDIO DEVICES COMBOBOX
 		vector<string> audio_sources = Recorder::recorder_get_audio_devices_list();
-		wx_audio_sources = wxArrayString();
-		for (string s : audio_sources)
-		{
-			wx_audio_sources.Add(s);
-		}
-		audio_source = new wxChoice(this, AUDIO_COMBOBOX_ID, wxDefaultPosition, wxDefaultSize, wx_audio_sources);
-		audio_source->SetSelection(0);
+		if (audio_sources.size() == 0) {
+			wx_audio_sources = wxArrayString();
+			wx_audio_sources.Add("No device found");
 
+			audio_source = new wxChoice(this, AUDIO_COMBOBOX_ID, wxDefaultPosition, wxDefaultSize, wx_audio_sources);
+			audio_source->SetSelection(0);
+			audio_source->Enable(false);
+
+			audio_sources_available = false;
+		}
+		else
+		{
+			wx_audio_sources = wxArrayString();
+			for (string s : audio_sources)
+			{
+				wx_audio_sources.Add(s);
+			}
+			audio_source = new wxChoice(this, AUDIO_COMBOBOX_ID, wxDefaultPosition, wxDefaultSize, wx_audio_sources);
+			audio_source->SetSelection(0);
+
+			audio_sources_available = true;
+		}
 
 		//	LABELS
 
@@ -231,7 +245,7 @@ void cMain::OnRecClicked(wxCommandEvent& evt)
 
 			vector<int> screen_dim;
 
-			if (mic_enabled) 
+			if (mic_enabled && audio_sources_available) 
 			{
 				int audio_choice = audio_source->GetSelection();
 				screen_dim = r->recorder_open_inputs(wx_video_sources[video_choice].ToStdString(), stoi(wx_rec_fps[fps_choice].ToStdString()), wx_audio_sources[audio_choice].ToStdString());
@@ -319,11 +333,17 @@ void cMain::OnMicClicked(wxCommandEvent& evt)
 	}
 	else
 	{
-		mic_btn->SetBitmap(*mic_on_btm);
-		mic_label->SetLabel("Mic on");
-		mic_enabled = true;
+		if (audio_sources_available)
+		{
+			mic_btn->SetBitmap(*mic_on_btm);
+			mic_label->SetLabel("Mic on");
+			mic_enabled = true;
+		}
+		else
+		{
+			wxMessageBox("No audio source available, impossible to enable mic", "Microphone not enabled", wxICON_WARNING);
+		}
 	}
-	
 	evt.Skip();
 }
 

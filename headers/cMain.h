@@ -23,6 +23,8 @@ private:
     bool paused;
     bool in_settings;
 
+    bool audio_sources_available;
+
     bool perform_crop;
     int crop_w, crop_h, crop_x, crop_y;
 
