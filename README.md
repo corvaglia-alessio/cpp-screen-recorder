@@ -17,7 +17,7 @@ The library and the application are able to:
 - Capture only a portion of the screen using the crop function
 - Works on Linux, Windows and MacOS (the application has not been tested on MacOS, while the library works also on MacOS)
 
-![Main Windows] [/images/main.png]
-![Settings] [/images/settings.png]
+![Main Windows] (/images/main.png)
+![Settings] (/images/settings.png)
 
 FFmpeg libraries and WxWidgets must be installed on the system.
